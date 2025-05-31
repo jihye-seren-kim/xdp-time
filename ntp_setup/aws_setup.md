@@ -49,7 +49,7 @@ sudo apt install chrony -y
 
 ## 2. NTP Server (NTS) - TLS certificate Generation
 
-- /etc/chrony/certs/openssl-dns.cnf
+- /etc/chrony/certs/openssl-san.cnf
 
 ```bash
 [req]
