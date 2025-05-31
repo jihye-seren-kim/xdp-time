@@ -19,7 +19,7 @@ sudo arp -s 172.31.0.21 0e:ea:b6:d8:7a:33
 ## 2. Server (`172.31.0.40/20`)
 ```bash
 sudo ip route add 172.31.0.10 via 172.31.0.30 dev ens5
-sudo ip route add 172.31.0.20 via 172.31.0.30 dev ens5
+sudo ip route add 172.31.0.21 via 172.31.0.30 dev ens5
 sudo arp -s 172.31.0.30 0e:fc:f9:7f:2e:77 
 ```
 
