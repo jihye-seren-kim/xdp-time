@@ -2,17 +2,18 @@
 
 - NTP Client (`ens5`) → `172.31.0.10/20`, `0e:3e:5c:a3:0b:af`
 - NTP Defense
-  - `ens5` (client-facing) → `172.31.0.20/20`, `0e:98:87:aa:82:07`  
-  - `ens6` (server-facing) → `172.31.0.30/20`, `0e:fc:f9:7f:2e:77`
+  - `ens5` → SSH/Public IP (`172.31.0.20/20`)
+  - `ens6` (client-facing) → `172.31.0.21/20`, `0e:ea:b6:d8:7a:33`  
+  - `ens7` (server-facing) → `172.31.0.30/20`, `0e:fc:f9:7f:2e:77`
 - NTP Server (`ens5`) → `172.31.0.40/20`, `0e:2b:6c:5c:5b:8d` 
 
 # Network Routing & ARP Configuration
 
 ## 1. Client (`172.31.0.10/20`)
 ```bash
-sudo ip route add 172.31.0.40 via 172.31.0.20 dev ens5
-sudo ip route add 172.31.0.30 via 172.31.0.20 dev ens5
-sudo arp -s 172.31.0.20 0e:98:87:aa:82:07 
+sudo ip route add 172.31.0.40 via 172.31.0.21 dev ens5
+sudo ip route add 172.31.0.30 via 172.31.0.21 dev ens5
+sudo arp -s 172.31.0.21 0e:ea:b6:d8:7a:33 
 ```
 
 ## 2. Server (`172.31.0.40/20`)
@@ -29,9 +30,9 @@ sudo sysctl -p
 ```
 
 ```bash
-sudo ip route add 172.31.0.10 dev ens5
+sudo ip route add 172.31.0.10 dev ens6
 sudo arp -s 172.31.0.10 0e:3e:5c:a3:0b:af 
-sudo ip route add 172.31.0.40 dev ens6
+sudo ip route add 172.31.0.40 dev ens7
 sudo arp -s 172.31.0.40 0e:2b:6c:5c:5b:8d
 ```
 
