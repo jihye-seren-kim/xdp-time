@@ -1,33 +1,36 @@
 # IP Design (AWS, AZ - eu-north-1c)
 
-- NTP Client (`ens5`) → `172.31.0.10/20`
+- NTP Client (`ens5`) → `172.31.0.10/20`, `0e:3e:5c:a3:0b:af`
 - NTP Defense
-  - `ens5` (client-facing) → 172.31.0.20/20
-  - `ens6` (server-facing) → 172.31.0.30/20
-- NTP Server (`ens5`) → 172.31.0.40/20
+  - `ens5` (client-facing) → `172.31.0.20/20`, `0e:98:87:aa:82:07`  
+  - `ens6` (server-facing) → `172.31.0.30/20`, `0e:fc:f9:7f:2e:77`
+- NTP Server (`ens5`) → `172.31.0.40/20`, `0e:2b:6c:5c:5b:8d` 
 
 # Network Routing & ARP Configuration
 
 ## 1. Client (`172.31.0.10/20`)
 ```bash
 sudo ip route add 172.31.0.40 via 172.31.0.20 dev ens5
-sudo arp -s 172.31.0.20 0e:98:87:aa:82:07  # Defense ens5 MAC address
+sudo ip route add 172.31.0.30 via 172.31.0.20 dev ens5
+sudo arp -s 172.31.0.20 0e:98:87:aa:82:07 
 ```
 
 ## 2. Server (`172.31.0.40/20`)
 ```bash
 sudo ip route add 172.31.0.10 via 172.31.0.30 dev ens5
-sudo arp -s 172.31.0.30 0e:fc:f9:7f:2e:77  # Defense ens6 MAC address
+sudo ip route add 172.31.0.20 via 172.31.0.30 dev ens5
+sudo arp -s 172.31.0.30 0e:fc:f9:7f:2e:77 
 ```
 
 ## 3. Defense (Middlebox)
 ```bash
-sudo sysctl -w net.ipv4.ip_forward=1
+echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
 ```
 
 ```bash
 sudo ip route add 172.31.0.10 dev ens5
-sudo arp -s 172.31.0.10 0e:3e:5c:a3:0b:af
+sudo arp -s 172.31.0.10 0e:3e:5c:a3:0b:af 
 sudo ip route add 172.31.0.40 dev ens6
 sudo arp -s 172.31.0.40 0e:2b:6c:5c:5b:8d
 ```
@@ -37,6 +40,8 @@ sudo arp -s 172.31.0.40 0e:2b:6c:5c:5b:8d
 - Ensure all instances are in the same AZ: `eu-north-1c`.
 - Verify MAC addresses using `ip link show dev <interface>`.
 - Use `tcpdump` on Defense to validate packet flow (e.g., `udp port 123` for NTP).
+- Ensure to disable Source/Destination Check on the Defense VM in the AWS console
+  `Actions > Networking > Change source/dest check > Stop`
 
 # Chrony + NTP Setup (Client & Server)
 
@@ -49,7 +54,7 @@ sudo apt install chrony -y
 
 ## 2. NTP Server (NTS) - TLS certificate Generation
 
-- /etc/chrony/certs/openssl-san.cnf
+- /etc/chrony/certs/openssl-san.conf
 
 ```bash
 [req]
@@ -81,7 +86,7 @@ cd /etc/chrony/certs
 
 sudo openssl req -x509 -nodes -newkey rsa:2048 \
   -keyout server.key -out server.crt -days 3650 \
-  -config openssl-san.cnf
+  -config openssl-san.conf
 ```
 
 ```bash
@@ -134,8 +139,16 @@ sudo update-ca-certificates --fresh
 ls -l /etc/ssl/certs | grep server
 ```
   
-## 6. Client Hostname Resolution (/etc/host)
+- Client Hostname Resolution (/etc/host)
 
 ```bash
 echo "172.31.0.40 ntp-server.local" | sudo tee -a /etc/hosts
+```
+
+- Check `chronyc sources -v`
+e.g.,
+```bash
+MS Name/IP address         Stratum Poll Reach LastRx Last sample               
+===============================================================================
+^* ntp-server.local              4   6    17     9  -1219ns[-6804ns] +/-  470us
 ```
