@@ -16,19 +16,19 @@ clang -O2 -target bpf -c cs_ratelimit.c -o cs_ratelimit.o -g -D__TARGET_ARCH_x86
 clang -O2 -target bpf -c sc_amppre.c -o sc_amppre.o -g -D__TARGET_ARCH_x86
 
 # Set MTU to safe value
-sudo ip link set ens5 mtu 1500
 sudo ip link set ens6 mtu 1500
+sudo ip link set ens7 mtu 1500
 
 # Reduce ENA NIC queues to avoid XDP attach failure
-sudo ethtool -L ens5 combined 1
 sudo ethtool -L ens6 combined 1
+sudo ethtool -L ens7 combined 1
 
 # Wait briefly to ensure queue change is applied
 sleep 2
 
 # Attach XDP programs to interfaces
-sudo ip link set dev ens5 xdp obj cs_ratelimit.o sec xdp
-sudo ip link set dev ens6 xdp obj sc_amppre.o sec xdp
+sudo ip link set dev ens6 xdp obj cs_ratelimit.o sec xdp
+sudo ip link set dev ens7 xdp obj sc_amppre.o sec xdp
 
 # Print success message
-echo "[+] XDP programs successfully attached to ens5 and ens6"
+echo "[+] XDP programs successfully attached to ens6 and ens7"
