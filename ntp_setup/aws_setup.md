@@ -43,6 +43,8 @@ sudo arp -s 172.31.0.40 0e:2b:6c:5c:5b:8d
 - Use `tcpdump` on Defense to validate packet flow (e.g., `udp port 123` for NTP).
 - Ensure to disable Source/Destination Check on the Defense VM in the AWS console
   `Actions > Networking > Change source/dest check > Stop`
+- Clear ARP cache: `sudo ip -s -s neigh flush all`
+
 
 # Chrony + NTP Setup (Client & Server)
 
