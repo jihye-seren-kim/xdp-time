@@ -115,7 +115,7 @@ ls -l /etc/ssl/certs | grep server
 - Client Hostname Resolution (/etc/host)
 
 ```bash
-echo "172.31.0.40 ntp-server.local" | sudo tee -a /etc/hosts
+echo "172.31.0.30 ntp-server.local" | sudo tee -a /etc/hosts
 ```
 
 ```bash
