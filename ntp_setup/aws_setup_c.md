@@ -131,4 +131,6 @@ MS Name/IP address         Stratum Poll Reach LastRx Last sample
 ===============================================================================
 ^* ntp-server.local              4   6    17     9  -1219ns[-6804ns] +/-  470us
 ^* ntp-server.local              4   6    17     2  +9077ns[  +23us] +/-  471us
+^* ntp-server.local              4   6    37    44    -54ns[  +25us] +/-  286us
+^* ntp-server.local              4   6    77     7    +43us[  +63us] +/-  347us
 ```
