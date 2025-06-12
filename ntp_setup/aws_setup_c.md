@@ -9,6 +9,7 @@
 # Network Routing & ARP Configuration
 
 ## 1. Client (`172.31.0.10/20`)
+
 ```bash
 sudo arp -s 172.31.0.30 0e:fc:f9:7f:2e:77
 ```
@@ -17,26 +18,27 @@ sudo arp -s 172.31.0.30 0e:fc:f9:7f:2e:77
 echo 0 | sudo tee /proc/sys/net/ipv4/conf/all/rp_filter
 echo 0 | sudo tee /proc/sys/net/ipv4/conf/ens5/rp_filter
 
-# (a) accept_local: 로컬 IP가 외부 인터페이스에서 수신될 때 허용 여부
+# (a) accept_local: Whether to allow local IP addresses received on an external interface
 echo 1 | sudo tee /proc/sys/net/ipv4/conf/ens5/accept_local
 
-# (b) arp_accept: ARP 요청에 대해 수동 등록 허용 여부
+# (b) arp_accept: Whether to allow manual registration in response to ARP requests
 echo 1 | sudo tee /proc/sys/net/ipv4/conf/ens5/arp_accept
 
-# (c) arp_filter: 동일 서브넷의 IP가 여러 NIC에 있을 때의 필터링
+# (c) arp_filter: Filtering behavior when multiple NICs have IPs in the same subnet
 echo 0 | sudo tee /proc/sys/net/ipv4/conf/ens5/arp_filter
 ```
 
 ## 2. Server + Defense (`172.31.0.30/20, 172.31.0.40/20`)
+
+```bash
+sudo ip route add 172.31.0.10 dev ens7
+```
+
 ```bash
 echo "200 to_client" | sudo tee -a /etc/iproute2/rt_tables
 sudo ip rule add from 172.31.0.30 table to_client
 sudo ip route add 172.31.0.0/20 dev ens7 table to_client
 sudo arp -s 172.31.0.10 0e:3e:5c:a3:0b:af
-```
-
-```bash
-echo 0 | sudo tee /proc/sys/net/ipv4/conf/all/rp_filter
 ```
 
 ```bash
