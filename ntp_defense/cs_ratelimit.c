@@ -109,7 +109,7 @@ int xdp_ingress_rate_limit(struct xdp_md *ctx) {
                     bpf_map_update_elem(&ip_rate_map, &src_ip, &new_info, BPF_ANY);
                 }
 
-            __u32 out_ifindex = (in_ifindex == 3) ? 4 : 3; // 예시: 3 ↔ 4
+            __u32 out_ifindex = (in_ifindex == 3) ? 4 : 3; 
             struct mac_addr *dst_mac = bpf_map_lookup_elem(&mac_map, &out_ifindex);
             if (dst_mac)
                 __builtin_memcpy(eth->h_dest, dst_mac->addr, 6);
